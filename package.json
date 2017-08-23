@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/olemartin/ruter-bridge#readme",
   "dependencies": {
+    "dateformatter": "^0.1.0",
     "express": "^4.15.4",
-    "ruter-api": "^1.0.4"
+    "ruter-api": "^1.0.4",
+    "utm": "^1.1.1"
   }
 }
