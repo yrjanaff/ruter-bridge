@@ -1,0 +1,23 @@
+{
+  "name": "ruter-bridge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/olemartin/ruter-bridge.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/olemartin/ruter-bridge/issues"
+  },
+  "homepage": "https://github.com/olemartin/ruter-bridge#readme",
+  "dependencies": {
+    "express": "^4.15.4",
+    "ruter-api": "^1.0.4"
+  }
+}
