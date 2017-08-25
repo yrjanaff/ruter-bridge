@@ -1,11 +1,15 @@
-const express = require('express')
-const ruter = require('ruter-api');
-const app = express()
+const bodyParser = require('body-parser');
+const ruterhandler = require('./ruter.js')
+const express = require('express');
+const app = express();
+
 const port = process.env.PORT || 3000
 
-app.get('/', function (req, res) {
-  res.send('Hello World!')
-})
+
+app.use(bodyParser.json());
+process.env.DEBUG = 'actions-on-google:* node index.js'
+
+app.post('/ruter', ruterhandler.findBus);
 
 app.listen(port, function () {
   console.log('Example app listening on port 3000!')

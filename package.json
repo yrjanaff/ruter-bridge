@@ -18,7 +18,10 @@
   },
   "homepage": "https://github.com/olemartin/ruter-bridge#readme",
   "dependencies": {
+    "actions-on-google": "^1.2.1",
+    "body-parser": "^1.17.2",
     "dateformatter": "^0.1.0",
+    "debug": "^3.0.1",
     "express": "^4.15.4",
     "ruter-api": "^1.0.4",
     "utm": "^1.1.1"
