@@ -20,7 +20,7 @@ exports.findBus = (req, res) => {
                 console.log("Transportation: " + transportationId);
 
                 const result = response.result.filter(stop => stop.Lines.filter(line => line.Transportation == transportationId).length > 0);
-                debug("Results: " + result);
+                console.log("Results: " + result);
 
                 ruter.api("StopVisit/GetDepartures/"+result[0].ID, {}, response => {
                     const expectedDepartureTime = result[0].MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime;
