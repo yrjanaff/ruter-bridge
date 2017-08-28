@@ -19,37 +19,40 @@ exports.findBus = (req, res) => {
     }
 
     function retrieveBuses(index, callback) {
-        if (apiai.isPermissionGranted()) {
+        var location;
+        if (apiai.getContextArgument('requesting-bus', 'location') {
+            location = apiai.getContextArgument('requesting-bus', 'location');
+        } else if (apiai.isPermissionGranted()) {
             const coordinates = apiai.getDeviceLocation().coordinates;
-            const location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
+            location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
             apiai.setContext('requesting-bus', 5, {location: location})
-            ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
-                var transportation = apiai.getContextArgument('requesting-bus', 'Transportation-method').value;
-                var transportationId = transportation == 'bus' ? 2 : 8;
-                debug("Transportation: " + transportationId);
-                console.log("Transportation: " + transportationId);
-
-                const result = response.result.filter(stop => stop.Lines.filter(line => line.Transportation == transportationId).length > 0);
-                console.log("Results: " + JSON.stringify(result));
-
-                ruter.api("StopVisit/GetDepartures/"+result[0].ID, {}, response => {
-                    const expectedDepartureTime = response.result[0].MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime;
-                    console.log("ExpectedDepartureTime: " + expectedDepartureTime);
-
-                    const date = new Date(expectedDepartureTime);
-                    if (response.result.length > index) {
-                    const name = response.result[index].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
-                    const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
-                    apiai.setContext('bus-number', 5, {index: index})
-                    callback(text);
-                } else {
-                    callback("Sorry, I have no more results");
-                }
-                });
-            });
-        }else{
+        } else {
             apiai.tell('Sorry, I need to know your current address');
         }
+        ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
+            var transportation = apiai.getContextArgument('requesting-bus', 'Transportation-method').value;
+            var transportationId = transportation == 'bus' ? 2 : 8;
+            debug("Transportation: " + transportationId);
+            console.log("Transportation: " + transportationId);
+
+            const result = response.result.filter(stop => stop.Lines.filter(line => line.Transportation == transportationId).length > 0);
+            console.log("Results: " + JSON.stringify(result));
+
+            ruter.api("StopVisit/GetDepartures/"+result[0].ID, {}, response => {
+                const expectedDepartureTime = response.result[0].MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime;
+                console.log("ExpectedDepartureTime: " + expectedDepartureTime);
+
+                const date = new Date(expectedDepartureTime);
+                if (response.result.length > index) {
+                const name = response.result[index].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
+                const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
+                apiai.setContext('bus-number', 5, {index: index})
+                callback(text);
+            } else {
+                callback("Sorry, I have no more results");
+            }
+            });
+        });
     }
 
 
