@@ -14,7 +14,7 @@ exports.findBus = (req, res) => {
     }
 
     function searchNext() {
-        var index = apiai.getContextArgument('bus-number', 'index').value;
+        var index = apiai.getContextArgument('requesting-bus', 'bus-number').value;
         retrieveBuses(index + 1, text => apiai.ask(text));
     }
 
@@ -46,7 +46,7 @@ exports.findBus = (req, res) => {
                 if (response.result.length > index) {
                 const name = response.result[index].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
                 const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
-                apiai.setContext('bus-number', 5, {index: index})
+                apiai.setContext('requesting-bus', 5, {'bus-number': index})
                 callback(text);
             } else {
                 callback("Sorry, I have no more results");
