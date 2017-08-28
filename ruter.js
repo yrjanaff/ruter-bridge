@@ -20,7 +20,7 @@ exports.findBus = (req, res) => {
 
     function retrieveBuses(index, callback) {
         var location;
-        if (apiai.getContextArgument('requesting-bus', 'location') {
+        if (apiai.getContextArgument('requesting-bus', 'location')) {
             location = apiai.getContextArgument('requesting-bus', 'location');
         } else if (apiai.isPermissionGranted()) {
             const coordinates = apiai.getDeviceLocation().coordinates;
