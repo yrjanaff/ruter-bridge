@@ -2,7 +2,7 @@ const bodyParser = require('body-parser');
 const ruterhandler = require('./ruter.js')
 const express = require('express');
 const app = express();
-const debug = require('debug');
+const debug = require('debug')('app');
 
 const port = process.env.PORT || 3000
 

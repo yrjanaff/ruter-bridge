@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const utm = require('utm')
 const dateformat = require('dateformatter').format;
 const ApiAiApp = require('actions-on-google').ApiAiApp;
-const debug = require('debug');
+const debug = require('debug')('app');
 //const location = utm.fromLatLon(59.9382647,10.8129383, 32);
 debug.log = console.log.bind(console);
 exports.findBus = (req, res) => {
