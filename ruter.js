@@ -17,7 +17,7 @@ exports.findBus = (req, res) => {
             ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
                 var transportationId = apiai.getContextArgument('requesting-bus', 'Transportation-method') == 'bus' ? 2 : 8;
                 debug("Transportation: " + transportationId);
-                console.log("Transportation: " + transportationId
+                console.log("Transportation: " + transportationId);
 
                 const result = response.result.filter(stop => stop.Lines.filter(line => line.Transportation == transportationId).length > 0);
                 debug("Results: " + result);
