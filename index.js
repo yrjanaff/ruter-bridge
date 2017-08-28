@@ -5,6 +5,8 @@ const app = express();
 
 const port = process.env.PORT || 3000
 
+debug.log = console.log.bind(console);
+
 
 app.use(bodyParser.json());
 process.env.DEBUG = 'actions-on-google:* node index.js'
