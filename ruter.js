@@ -10,6 +10,15 @@ exports.findBus = (req, res) => {
     const apiai = new ApiAiApp({request: req, response: res});
 
     function search() {
+        retrieveBuses(0, text => apiai.tell(text));
+    }
+
+    function searchNext() {
+        var index = apiai.getContextArgument('bus-number', 'index').value;
+        retrieveBuses(index + 1, text => apiai.tell(text));
+    }
+
+    function retrieveBuses(index, callback) {
         if (apiai.isPermissionGranted()) {
 
             const coordinates = apiai.getDeviceLocation().coordinates;
@@ -28,15 +37,22 @@ exports.findBus = (req, res) => {
                     console.log("ExpectedDepartureTime: " + expectedDepartureTime);
 
                     const date = new Date(expectedDepartureTime);
-                    const name = response.result[0].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
+                    if (response.result.length > index) {
+                    const name = response.result[index].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
                     const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
-                    apiai.tell(text);
+                    apiai.setContext('bus-number', 5, {index: index})
+                    callback(text);
+                } else {
+                    callback("Sorry, I have no more results");
+                }
                 });
             });
         }else{
             apiai.tell('Sorry, I need to know your current address');
         }
     }
+
+
     function check() {
         const permissions = [
             apiai.SupportedPermissions.DEVICE_PRECISE_LOCATION
@@ -48,5 +64,6 @@ exports.findBus = (req, res) => {
         const actionMap = new Map();
         actionMap.set('permission.granted', search);
         actionMap.set('bus.schedule', check);
+        actionMap.set('bus.schedule.next', searchNext);
         apiai.handleRequest(actionMap);
 };
