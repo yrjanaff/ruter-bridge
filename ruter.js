@@ -15,7 +15,8 @@ exports.findBus = (req, res) => {
             const coordinates = apiai.getDeviceLocation().coordinates;
             const location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
             ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
-                var transportationId = apiai.getContextArgument('requesting-bus', 'Transportation-method') == 'bus' ? 2 : 8;
+                var transportation = apiai.getContextArgument('requesting-bus', 'Transportation-method');
+                var transportationId = transportation == 'bus' ? 2 : 8;
                 debug("Transportation: " + transportationId);
                 console.log("Transportation: " + transportationId);
 
@@ -23,11 +24,12 @@ exports.findBus = (req, res) => {
                 console.log("Results: " + JSON.stringify(result));
 
                 ruter.api("StopVisit/GetDepartures/"+result[0].ID, {}, response => {
+                    const expectedDepartureTime = response.result[0].MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime;
                     console.log("ExpectedDepartureTime: " + expectedDepartureTime);
-                    const expectedDepartureTime = result[0].MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime;
+
                     const date = new Date(expectedDepartureTime);
-                    const name = result[0].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
-                    const text = "The bus " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
+                    const name = response.result[0].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
+                    const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
                     apiai.tell(text);
                 });
             });
