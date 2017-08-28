@@ -10,12 +10,12 @@ exports.findBus = (req, res) => {
     const apiai = new ApiAiApp({request: req, response: res});
 
     function search() {
-        retrieveBuses(0, text => apiai.tell(text));
+        retrieveBuses(0, text => apiai.ask(text));
     }
 
     function searchNext() {
         var index = apiai.getContextArgument('bus-number', 'index').value;
-        retrieveBuses(index + 1, text => apiai.tell(text));
+        retrieveBuses(index + 1, text => apiai.ask(text));
     }
 
     function retrieveBuses(index, callback) {
