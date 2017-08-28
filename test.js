@@ -3,6 +3,7 @@ const utm = require('utm')
 var dateformat = require('dateformatter').format;
 
 const location = utm.fromLatLon(59.9382647,10.8129383, 32);
+console.log(location)
 ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
     result = response;
     ruter.api("StopVisit/GetDepartures/"+response.result[0].ID, {}, response => {

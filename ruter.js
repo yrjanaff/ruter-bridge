@@ -14,10 +14,21 @@ exports.findBus = (req, res) => {
             const coordinates = apiai.getDeviceLocation().coordinates;
             const location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
             ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
-                ruter.api("StopVisit/GetDepartures/"+response.result[0].ID, {}, response => {
-                    const expectedDepartureTime = response.result[0].MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime;
+                const subwaystops = response.result.filter(stop => stop.Lines.filter(line => line.Transportation == 8).length > 0);
+                const busstops = response.result.filter(stop => stop.Lines.filter(line => line.Transportation == 2).length > 0);
+
+                if (apiai.getContextArgument ('requesting-bus', 'Transportation-method') == 'bus') {
+                    result = busstops;
+                } else if (apiai.getContextArgument ('requesting-bus', 'Transportation-method') == 'subway') {
+                    result = subwaystops;
+                }
+
+
+
+                ruter.api("StopVisit/GetDepartures/"+result[0].ID, {}, response => {
+                    const expectedDepartureTime = result[0].MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime;
                     const date = new Date(expectedDepartureTime);
-                    const name = response.result[0].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
+                    const name = result[0].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
                     const text = "The bus " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
                     apiai.tell(text);
                 });
