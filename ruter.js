@@ -25,7 +25,6 @@ exports.findBus = (req, res) => {
         } else if (apiai.isPermissionGranted()) {
             const coordinates = apiai.getDeviceLocation().coordinates;
             location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
-            apiai.setContext('requesting-bus', 5, {location: location})
         } else {
             apiai.tell('Sorry, I need to know your current address');
         }
@@ -46,7 +45,7 @@ exports.findBus = (req, res) => {
                 if (response.result.length > index) {
                 const name = response.result[index].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
                 const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
-                apiai.setContext('requesting-bus', 5, {'bus-number': index})
+                apiai.setContext('requesting-bus', 5, {'bus-number': index, "location" : location})
                 callback(text);
             } else {
                 callback("Sorry, I have no more results");
