@@ -20,9 +20,9 @@ exports.findBus = (req, res) => {
 
     function retrieveBuses(index, callback) {
         if (apiai.isPermissionGranted()) {
-
             const coordinates = apiai.getDeviceLocation().coordinates;
             const location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
+            apiai.setContext('requesting-bus', 5, {location: location})
             ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
                 var transportation = apiai.getContextArgument('requesting-bus', 'Transportation-method').value;
                 var transportationId = transportation == 'bus' ? 2 : 8;
