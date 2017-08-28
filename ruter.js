@@ -14,11 +14,11 @@ exports.findBus = (req, res) => {
             const coordinates = apiai.getDeviceLocation().coordinates;
             const location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
             ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
-                var transportationId = apiai.getContextArgument('requesting-bus', 'Transportation-method') == 'bus') ? 2 : 8;
+                var transportationId = apiai.getContextArgument('requesting-bus', 'Transportation-method') == 'bus' ? 2 : 8;
 
 
                 const result = response.result.filter(stop => stop.Lines.filter(line => line.Transportation == transportationId).length > 0);
-                
+
 
                 ruter.api("StopVisit/GetDepartures/"+result[0].ID, {}, response => {
                     const expectedDepartureTime = result[0].MonitoredVehicleJourney.MonitoredCall.ExpectedDepartureTime;
