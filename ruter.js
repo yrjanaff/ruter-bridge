@@ -15,7 +15,7 @@ exports.findBus = (req, res) => {
             const coordinates = apiai.getDeviceLocation().coordinates;
             const location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
             ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
-                var transportation = apiai.getContextArgument('requesting-bus', 'Transportation-method');
+                var transportation = apiai.getContextArgument('requesting-bus', 'Transportation-method').value;
                 var transportationId = transportation == 'bus' ? 2 : 8;
                 debug("Transportation: " + transportationId);
                 console.log("Transportation: " + transportationId);
