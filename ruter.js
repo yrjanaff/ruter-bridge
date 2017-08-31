@@ -10,10 +10,10 @@ exports.findBus = (req, res) => {
     const apiai = new ApiAiApp({request: req, response: res});
 
     function search() {
-        retrieveBuses(0, text => apiai.ask(text));
+        retrieveBuses(text => apiai.ask(text));
     }
 
-    function retrieveBuses(index, callback) {
+    function retrieveBuses(callback) {
         var location;
         if (apiai.getContextArgument('requesting-bus', 'location')) {
             location = apiai.getContextArgument('requesting-bus', 'location');
@@ -21,11 +21,7 @@ exports.findBus = (req, res) => {
             const coordinates = apiai.getDeviceLocation().coordinates;
             location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
         } else {
-            const permissions = [
-                apiai.SupportedPermissions.DEVICE_PRECISE_LOCATION
-            ];
-            apiai.askForPermissions('To find your nearest bus stop', permissions);
-            return;
+            apiai.tell('Sorry, I need to know your current address');
         }
         ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
             var transportation = apiai.getContextArgument('requesting-bus', 'Transportation-method').value;
@@ -41,17 +37,23 @@ exports.findBus = (req, res) => {
                 console.log("ExpectedDepartureTime: " + expectedDepartureTime);
 
                 const date = new Date(expectedDepartureTime);
-                if (response.result.length > index) {
-                    const name = response.result[index].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
-                    const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
-                    apiai.setContext('requesting-bus', 5, {'bus-number': index, "location" : location})
-                    callback(text);
-                } else {
-                    callback("Sorry, I have no more results");
-                }
+
+                const name = response.result[0].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
+                const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
+                apiai.setContext('requesting-bus', 5, {"location" : location})
+                callback(text);
             });
         });
     }
+
+
+    function check() {
+        const permissions = [
+            apiai.SupportedPermissions.DEVICE_PRECISE_LOCATION
+        ];
+        apiai.askForPermissions('To find your nearest bus stop', permissions);
+    }
+
 
     const actionMap = new Map();
     actionMap.set('permission.granted', search);
