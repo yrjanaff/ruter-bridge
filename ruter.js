@@ -26,7 +26,11 @@ exports.findBus = (req, res) => {
             const coordinates = apiai.getDeviceLocation().coordinates;
             location = utm.fromLatLon(coordinates.latitude, coordinates.longitude, 32);
         } else {
-            apiai.tell('Sorry, I need to know your current address');
+            const permissions = [
+                apiai.SupportedPermissions.DEVICE_PRECISE_LOCATION
+            ];
+            apiai.askForPermissions('To find your nearest bus stop', permissions);
+            return;
         }
         ruter.api("Place/GetClosestStops?coordinates=(x="+Math.round(location.easting)+",y="+Math.round(location.northing)+")", {}, response => {
             var transportation = apiai.getContextArgument('requesting-bus', 'Transportation-method').value;
@@ -43,23 +47,15 @@ exports.findBus = (req, res) => {
 
                 const date = new Date(expectedDepartureTime);
                 if (response.result.length > index) {
-                const name = response.result[index].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
-                const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
-                apiai.setContext('requesting-bus', 5, {'bus-number': index, "location" : location})
-                callback(text);
-            } else {
-                callback("Sorry, I have no more results");
-            }
+                    const name = response.result[index].MonitoredVehicleJourney.MonitoredCall.DestinationDisplay;
+                    const text = "The " + transportation + " " + name + " is leaving at " + dateformat("H:i", date)+ ". It's in " + parseInt(dateformat("i", date - new Date())) + " minutes";
+                    apiai.setContext('requesting-bus', 5, {'bus-number': index, "location" : location})
+                    callback(text);
+                } else {
+                    callback("Sorry, I have no more results");
+                }
             });
         });
-    }
-
-
-    function check() {
-        const permissions = [
-            apiai.SupportedPermissions.DEVICE_PRECISE_LOCATION
-        ];
-        apiai.askForPermissions('To find your nearest bus stop', permissions);
     }
 
 
