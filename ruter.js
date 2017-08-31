@@ -13,11 +13,6 @@ exports.findBus = (req, res) => {
         retrieveBuses(0, text => apiai.ask(text));
     }
 
-    function searchNext() {
-        var index = apiai.getContextArgument('requesting-bus', 'bus-number').value;
-        retrieveBuses(index + 1, text => apiai.ask(text));
-    }
-
     function retrieveBuses(index, callback) {
         var location;
         if (apiai.getContextArgument('requesting-bus', 'location')) {
@@ -58,10 +53,8 @@ exports.findBus = (req, res) => {
         });
     }
 
-
-        const actionMap = new Map();
-        actionMap.set('permission.granted', search);
-        actionMap.set('bus.schedule', check);
-        actionMap.set('bus.schedule.next', searchNext);
-        apiai.handleRequest(actionMap);
+    const actionMap = new Map();
+    actionMap.set('permission.granted', search);
+    actionMap.set('bus.schedule', check);
+    apiai.handleRequest(actionMap);
 };
